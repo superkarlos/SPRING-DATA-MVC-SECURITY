@@ -39,38 +39,41 @@ public class TurmaService {
     @Autowired
     private RepositorioAluno repositorioAluno;
 
-    public TurmaEntity cadastrar( @Valid TurmaDTO turma) {
-        if(turma.nome() == null || turma.codigo() == null){
+    public TurmaEntity cadastrar(@Valid TurmaDTO turma) {
+        if (turma.nome() == null || turma.codigo() == null) {
             System.out.println("null");
-          throw new TurmaNotFoudExecption("O nome da turma e o codigo é obrigatorio!!");
-         
-        }
-      
-    TurmaEntity turmaEntity = new TurmaEntity();
-    BeanUtils.copyProperties(turma, turmaEntity);
-   
-    // Verificação do professor
-    if (turmaEntity.getProfessorDisciplina() != null) {
-        Optional<ProfessorEntity> profOptional = this.repositorioProfessor.findById(turmaEntity.getProfessorDisciplina().getId());
-        if (profOptional.isEmpty()) {
-            throw new TurmaNotFoudExecption("O professor não existe no banco de dados! Cadastre no banco de dados!"); }
-        turmaEntity.setProfessorDisciplina(profOptional.get());}
-    // Verificação dos alunos
-    if (turmaEntity.getLista_alunos() != null && !turmaEntity.getLista_alunos().isEmpty()) {
-        List<AlunoEntity> alunosExistentes = new ArrayList<>();
-        for (AlunoEntity aluno : turmaEntity.getLista_alunos()) {
-            Optional<AlunoEntity> alunoOptional = this.repositorioAluno.findById(aluno.getId());
-            if (alunoOptional.isEmpty()) {
-                throw new AlunoNotFoudExecption("O aluno com ID " + aluno.getId() + " não existe no banco de dados!");
-            }
-            alunosExistentes.add(alunoOptional.get());
-        }
-        turmaEntity.setLista_alunos(alunosExistentes);
-    }
-    return this.repositoryTurma.save(turmaEntity);
-}
+            throw new TurmaNotFoudExecption("O nome da turma e o codigo é obrigatorio!!");
 
-    
+        }
+
+        TurmaEntity turmaEntity = new TurmaEntity();
+        BeanUtils.copyProperties(turma, turmaEntity);
+
+        // Verificação do professor
+        if (turmaEntity.getProfessorDisciplina() != null) {
+            Optional<ProfessorEntity> profOptional = this.repositorioProfessor
+                    .findById(turmaEntity.getProfessorDisciplina().getId());
+            if (profOptional.isEmpty()) {
+                throw new TurmaNotFoudExecption(
+                        "O professor não existe no banco de dados! Cadastre no banco de dados!");
+            }
+            turmaEntity.setProfessorDisciplina(profOptional.get());
+        }
+        // Verificação dos alunos
+        if (turmaEntity.getLista_alunos() != null && !turmaEntity.getLista_alunos().isEmpty()) {
+            List<AlunoEntity> alunosExistentes = new ArrayList<>();
+            for (AlunoEntity aluno : turmaEntity.getLista_alunos()) {
+                Optional<AlunoEntity> alunoOptional = this.repositorioAluno.findById(aluno.getId());
+                if (alunoOptional.isEmpty()) {
+                    throw new AlunoNotFoudExecption(
+                            "O aluno com ID " + aluno.getId() + " não existe no banco de dados!");
+                }
+                alunosExistentes.add(alunoOptional.get());
+            }
+            turmaEntity.setLista_alunos(alunosExistentes);
+        }
+        return this.repositoryTurma.save(turmaEntity);
+    }
 
     public List<TurmaEntity> Lista_tumas() {
         return this.repositoryTurma.findAll();
@@ -79,11 +82,10 @@ public class TurmaService {
     public Object Lista_tumas_id(Long id) {
         Optional<TurmaEntity> optional = this.repositoryTurma.findById(id);
         if (optional.isEmpty()) {
-           throw new TurmaNotFoudExecption("turma de id : "+id+" Não Não foi cadastrada!");
+            throw new TurmaNotFoudExecption("turma de id : " + id + " Não Não foi cadastrada!");
         }
         TurmaEntity turmaEntity = optional.get();
         return turmaEntity;
-      
 
     }
 
@@ -91,11 +93,12 @@ public class TurmaService {
         Optional<ProfessorEntity> profOptional = this.repositorioProfessor.findById(idprofessor);
         if (profOptional.isEmpty()) {
             throw new TurmaNotFoudExecption("Professor não encontrado");
-       //     throw new TurmaNotFoudExecption("turma de id : "+id+" Não Não foi cadastrada!");
+            // throw new TurmaNotFoudExecption("turma de id : "+id+" Não Não foi
+            // cadastrada!");
         }
         Optional<TurmaEntity> turmaOptional = this.repositoryTurma.findById(idTurma);
         if (turmaOptional.isEmpty()) {
-            throw new TurmaNotFoudExecption ("Turma não encontrada");
+            throw new TurmaNotFoudExecption("Turma não encontrada");
         }
         ProfessorEntity professorEntity = profOptional.get();
         TurmaEntity turma = turmaOptional.get();
@@ -106,7 +109,7 @@ public class TurmaService {
 
     public String deletar(Long id) {
         Optional<TurmaEntity> turma = this.repositoryTurma.findById(id);
-        if(turma.isEmpty()){
+        if (turma.isEmpty()) {
             throw new TurmaNotFoudExecption("Turma não encontrada");
         }
         if (turma.isPresent()) {
@@ -125,66 +128,69 @@ public class TurmaService {
         }
     }
 
-///=============================================================================
-public Object editar(Long id, TurmaDTO turmaDTO) {
-    Optional<TurmaEntity> turma = this.repositoryTurma.findById(id);
-    if (turma.isEmpty()) {
-        throw new TurmaNotFoudExecption("Turma não encontrada");
-    }
-    TurmaEntity turmaEntity = turma.get();
-
-    // Atualização do nome
-    if (turmaDTO.nome() != null && !turmaDTO.nome().equals(turmaEntity.getNome())) {
-        turmaEntity.setNome(turmaDTO.nome());
-    }
-
-    // Atualização do código
-    if (turmaDTO.codigo() != null && !turmaDTO.codigo().equals(turmaEntity.getCodigo())) {
-        turmaEntity.setCodigo(turmaDTO.codigo());
-    }
-
-    // Verificação e atualização do professor
-    if (turmaDTO.professorDisciplina() != null) {
-        Optional<ProfessorEntity> profOptional = this.repositorioProfessor.findById(turmaDTO.professorDisciplina().getId());
-        if (profOptional.isEmpty()) {
-            throw new TurmaNotFoudExecption("O professor não existe no banco de dados! Cadastre no banco de dados!");
+    /// =============================================================================
+    public Object editar(Long id, TurmaDTO turmaDTO) {
+        Optional<TurmaEntity> turma = this.repositoryTurma.findById(id);
+        if (turma.isEmpty()) {
+            throw new TurmaNotFoudExecption("Turma não encontrada");
         }
-        turmaEntity.setProfessorDisciplina(profOptional.get());
-    } else if (turmaDTO.professorDisciplina() == null) {
-        turmaEntity.setProfessorDisciplina(null);
-    }
+        TurmaEntity turmaEntity = turma.get();
 
-    // Verificação e atualização dos alunos
-    if (turmaDTO.lista_alunos() != null) {
-        Set<Long> alunoIds = new HashSet<>();
-        List<AlunoEntity> alunosExistentes = new ArrayList<>();
-
-        for (AlunoEntity aluno : turmaDTO.lista_alunos()) {
-            if (!alunoIds.add(aluno.getId())) {
-                throw new AlunoNotFoudExecption("O aluno com ID " + aluno.getId() + " está duplicado na lista de alunos!");
-            }
-
-            Optional<AlunoEntity> alunoOptional = this.repositorioAluno.findById(aluno.getId());
-
-            if (alunoOptional.isEmpty()) {
-                throw new AlunoNotFoudExecption("O aluno com ID " + aluno.getId() + " não existe no banco de dados!");
-            }
-
-            alunosExistentes.add(alunoOptional.get());
+        // Atualização do nome
+        if (turmaDTO.nome() != null && !turmaDTO.nome().equals(turmaEntity.getNome())) {
+            turmaEntity.setNome(turmaDTO.nome());
         }
 
-        turmaEntity.setLista_alunos(alunosExistentes);
+        // Atualização do código
+        if (turmaDTO.codigo() != null && !turmaDTO.codigo().equals(turmaEntity.getCodigo())) {
+            turmaEntity.setCodigo(turmaDTO.codigo());
+        }
+
+        // Verificação e atualização do professor
+        if (turmaDTO.professorDisciplina() != null) {
+            Optional<ProfessorEntity> profOptional = this.repositorioProfessor
+                    .findById(turmaDTO.professorDisciplina().getId());
+            if (profOptional.isEmpty()) {
+                throw new TurmaNotFoudExecption(
+                        "O professor não existe no banco de dados! Cadastre no banco de dados!");
+            }
+            turmaEntity.setProfessorDisciplina(profOptional.get());
+        } else if (turmaDTO.professorDisciplina() == null) {
+            turmaEntity.setProfessorDisciplina(null);
+        }
+
+        // Verificação e atualização dos alunos
+        if (turmaDTO.lista_alunos() != null) {
+            Set<Long> alunoIds = new HashSet<>();
+            List<AlunoEntity> alunosExistentes = new ArrayList<>();
+
+            for (AlunoEntity aluno : turmaDTO.lista_alunos()) {
+                if (!alunoIds.add(aluno.getId())) {
+                    throw new AlunoNotFoudExecption(
+                            "O aluno com ID " + aluno.getId() + " está duplicado na lista de alunos!");
+                }
+
+                Optional<AlunoEntity> alunoOptional = this.repositorioAluno.findById(aluno.getId());
+
+                if (alunoOptional.isEmpty()) {
+                    throw new AlunoNotFoudExecption(
+                            "O aluno com ID " + aluno.getId() + " não existe no banco de dados!");
+                }
+
+                alunosExistentes.add(alunoOptional.get());
+            }
+
+            turmaEntity.setLista_alunos(alunosExistentes);
+        }
+
+        return this.repositoryTurma.save(turmaEntity);
+        // return "Turma atualizada com sucesso";
     }
 
-    return this.repositoryTurma.save(turmaEntity);
-   // return "Turma atualizada com sucesso";
-}
-
-    
-//================================================================================
+    // ================================================================================
     public Object exluirLogico(Long id) {
         Optional<TurmaEntity> Optional = this.repositoryTurma.findById(id);
-        if(Optional.isEmpty()){
+        if (Optional.isEmpty()) {
             throw new TurmaNotFoudExecption("Turma não encontrada");
         }
         if (Optional.isPresent()) {
@@ -195,7 +201,8 @@ public Object editar(Long id, TurmaDTO turmaDTO) {
             return "Não deletado logicamente";
         }
     }
-//================================================================================
+
+    // ================================================================================
     public List<TurmaEntity> lista_logica() {
         return this.repositoryTurma.findByAtivoTrue();
 
@@ -203,7 +210,7 @@ public Object editar(Long id, TurmaDTO turmaDTO) {
 
     public String excluir(Long id) {
         Optional<AlunoEntity> alunoOptional = this.repositorioAluno.findById(id);
-        if(alunoOptional .isEmpty()){
+        if (alunoOptional.isEmpty()) {
             throw new TurmaNotFoudExecption("Aluno não localizado");
         }
         if (alunoOptional.isPresent()) {
@@ -225,7 +232,7 @@ public Object editar(Long id, TurmaDTO turmaDTO) {
 
     public ResponseEntity<?> removerAluno(Long turmaId, Long alunoId) {
         Optional<TurmaEntity> turmaOptional = repositoryTurma.findById(turmaId);
-        if(turmaOptional.isEmpty()){
+        if (turmaOptional.isEmpty()) {
             throw new TurmaNotFoudExecption("Turma não encontrada");
         }
         if (turmaOptional.isPresent()) {
@@ -240,7 +247,8 @@ public Object editar(Long id, TurmaDTO turmaDTO) {
 
                     return ResponseEntity.status(HttpStatus.OK).body("Aluno removido da turma com sucesso!");
                 } else {
-                   // return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Aluno não encontrado na turma");
+                    // return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Aluno não encontrado
+                    // na turma");
                     throw new TurmaNotFoudExecption("Aluno não encontrado na turma");
                 }
             } else {
@@ -254,10 +262,10 @@ public Object editar(Long id, TurmaDTO turmaDTO) {
     public ResponseEntity<?> matricularAluno(Long id, Long idaluno) {
         Optional<TurmaEntity> optionalTurma = this.repositoryTurma.findById(id);
         Optional<AlunoEntity> optionalAluno = this.repositorioAluno.findById(idaluno);
-        if(optionalAluno.isEmpty()){
+        if (optionalAluno.isEmpty()) {
             throw new TurmaNotFoudExecption("Não é possivel cadastrar um aluno que não existe no banco de dados");
         }
-        if(optionalTurma.isEmpty()){
+        if (optionalTurma.isEmpty()) {
             throw new TurmaNotFoudExecption("Turma inexistente");
         }
 
@@ -278,17 +286,16 @@ public Object editar(Long id, TurmaDTO turmaDTO) {
         }
     }
 
-
     public String remover_professor(Long idturma, long idprofessor) {
         Optional<TurmaEntity> turma = this.repositoryTurma.findById(idturma);
         Optional<ProfessorEntity> optional = this.repositorioProfessor.findById(idprofessor);
-        
-        if(turma.isEmpty()){
+
+        if (turma.isEmpty()) {
             throw new TurmaNotFoudExecption("turma não encontrada");
         }
-        if(optional.isEmpty()){
+        if (optional.isEmpty()) {
             throw new ProfessorNotFoudExecption("Professor não encontrado");
-          }
+        }
         if (turma.isPresent()) {
             TurmaEntity novTurmaEntity = turma.get();
             if (novTurmaEntity.getProfessorDisciplina().getId() == idprofessor) {
@@ -302,34 +309,34 @@ public Object editar(Long id, TurmaDTO turmaDTO) {
             return "turma não encontrada";
         }
     }
-  
- public Object professor_turmas(Long id){
-    Optional<ProfessorEntity> professorOptional = repositorioProfessor.findById(id);
-    if(professorOptional.isEmpty()){
-        throw new ProfessorNotFoudExecption("Professor não encontrado");
+
+    public Object professor_turmas(Long id) {
+        Optional<ProfessorEntity> professorOptional = repositorioProfessor.findById(id);
+        if (professorOptional.isEmpty()) {
+            throw new ProfessorNotFoudExecption("Professor não encontrado");
+        }
+
+        ProfessorEntity professor = professorOptional.get();
+        List<TurmaEntity> turmas = professor.getTurmas();
+
+        List<String> nomesTurmas = turmas.stream().map(TurmaEntity::getNome).collect(Collectors.toList());
+
+        return "turmas do professor:" + professor.getNome() + "\n" + nomesTurmas;
     }
-    
-    ProfessorEntity professor = professorOptional.get();
-    List<TurmaEntity> turmas = professor.getTurmas();
-    
-    List<String> nomesTurmas = turmas.stream().map(TurmaEntity::getNome).collect(Collectors.toList());
-    
-    return  "turmas do professor:"+ professor.getNome() +"\n"+nomesTurmas;
- }
- 
- public Object aluno_turmas(Long id){
-    Optional<AlunoEntity> alunoOptional = repositorioAluno.findById(id);
-    if(alunoOptional.isEmpty()){
-        throw new AlunoNotFoudExecption("Aluno não encontrado");
+
+    public Object aluno_turmas(Long id) {
+        Optional<AlunoEntity> alunoOptional = repositorioAluno.findById(id);
+        if (alunoOptional.isEmpty()) {
+            throw new AlunoNotFoudExecption("Aluno não encontrado");
+        }
+
+        AlunoEntity aluno = alunoOptional.get();
+        List<TurmaEntity> turmas = aluno.getTurmas();
+
+        List<String> nomesTurmas = turmas.stream()
+                .map(TurmaEntity::getNome)
+                .collect(Collectors.toList());
+
+        return "Aluno: " + aluno.getNome() + ": \n" + nomesTurmas;
     }
-    
-    AlunoEntity aluno = alunoOptional.get();
-    List<TurmaEntity> turmas = aluno.getTurmas();
-    
-    List<String> nomesTurmas = turmas.stream()
-                                     .map(TurmaEntity::getNome)
-                                     .collect(Collectors.toList());
-    
-    return  "Aluno: "+aluno.getNome()+": \n"+ nomesTurmas;
-}
 }

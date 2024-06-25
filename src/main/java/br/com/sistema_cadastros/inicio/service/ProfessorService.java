@@ -89,8 +89,8 @@ public class ProfessorService {
 
     public String deletar(Long id) {
         Optional<ProfessorEntity> optional = this.repository.findById(id);
-        if(optional.isEmpty()){
-          throw new ProfessorNotFoudExecption("Professor não encontrado");
+        if (optional.isEmpty()) {
+            throw new ProfessorNotFoudExecption("Professor não encontrado");
         }
         if (optional.isPresent()) {
             // Remover a associação de todas as turmas
