@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # CRUD de Cadastros de Professores, Alunos e Turmas - API REST com Java Spring
 ## Introdução
 Este projeto é uma API REST desenvolvida em Java usando o framework Spring. A aplicação permite o gerenciamento de cadastros de professores, alunos e turmas, suportando operações CRUD (Create, Read, Update, Delete). A persistência de dados é realizada utilizando o MySQL, e o Spring Data JPA facilita as operações de banco de dados. Para validação de dados, utilizamos as anotações de validação do Spring, e o Lombok é empregado para reduzir a verbosidade do código junto a tratamento de erros.
@@ -99,3 +100,6 @@ Cadastrar um novo aluno:
 
 Conclusão
 Agora você está pronto para baixar, configurar e testar o projeto em sua máquina local. Sinta-se à vontade para explorar o código, fazer modificações e adicionar novas funcionalidades conforme necessário. Se encontrar algum problema, verifique novamente as configurações do banco de dados e certifique-se de que todas as dependências foram instaladas corretamente. Boa sorte!
+=======
+# Spring-security
+>>>>>>> 539a6b83a54a4a8cd4d029092cf56e253fd98388
